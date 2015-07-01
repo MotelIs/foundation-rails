@@ -1,0 +1,20 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: foundation_development
+  pool: 25
+  reconnect: false
+  timeout: 5000
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  socket: /tmp/postgresql.sock
+
+test: &test
+  adapter: postgresql
+  encoding: unicode
+  reconnect: false
+  database: foundation_test
+  pool: 25
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  socket: /tmp/postgresql.sock
