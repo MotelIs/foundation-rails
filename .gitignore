@@ -18,3 +18,10 @@
 
 # Ignore application configuration
 /config/application.yml
+
+# Ignore coverage test results
+/coverage/*
+
+# Ignore redis data stores
+dump.rdb
+
