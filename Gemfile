@@ -9,9 +9,9 @@ gem 'active_hash_relation'
 gem 'bcrypt'
 gem 'doorkeeper'
 gem 'pg'
-gem 'pundit'
 # May be required to specify the path to the 'pg_config' program installed with Postgres:
 #$ bundle config build.pg --with-pg-config=/Applications/Postgres.app/Contents/Versions/9.4/bin/pg_config
+gem 'pundit'
 gem 'rack-cors'
 gem 'rails', '4.2.1'
 gem 'redis'
