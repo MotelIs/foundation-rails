@@ -21,6 +21,7 @@ class User < ActiveRecord::Base
                     uniqueness: { case_sensitive: false }
 
   validates :password, presence: true, length: { maximum: 50, minimum: 8 }
+  validates :reset_password_token, length: { maximum: 255 }
 
   def access_token
     access_tokens.active.first
@@ -62,20 +63,26 @@ class User < ActiveRecord::Base
   def register
     if valid?
       user = find_or_create_user
-      # if existing_user.present? && !existing_user.partially_registered
-      #   UserRegistrationMailer.invite_existing_user(user).deliver_now
-      # else
-      #   UserRegistrationMailer.invite_new_user(user).deliver_now
-      # end
+      if existing_user.present? && !existing_user.partially_registered
+        UserActivationMailer.invite_existing_user(user).deliver_now
+      else
+        UserActivationMailer.invite_new_user(user).deliver_now
+      end
     end
   end
 
+  def request_password_reset
+    self.reset_password_sent_at = Time.now
+    self.reset_password_token = generate_reset_password_token
+    save
+  end
+
   def send_activation_email
-    UserMailer.account_activation(self).deliver_now
+    UserActivationMailer.account_activation(self).deliver_now
   end
 
   def send_password_reset_email
-    UserMailer.password_reset(self).deliver_now
+    PasswordMailer.reset_password(self).deliver_now
   end
 
   def User.digest(string)
@@ -100,6 +107,13 @@ class User < ActiveRecord::Base
     loop do
       self.authentication_token = SecureRandom.base64(64)
       break unless User.find_by(authentication_token: authentication_token)
+    end
+  end
+
+  def generate_reset_password_token
+    loop do
+      token = User.new_token
+      break token unless User.where(reset_password_token: token).exists?
     end
   end
 end
