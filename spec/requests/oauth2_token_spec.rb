@@ -24,8 +24,8 @@ describe "OAuth Tokens" do
       get oauth_token_info_path
       expect(response).to be_success
 
-      # json = JSON.parse(response.body)
-      # expect(json).to include('resource_owner_id', 'expires_in_seconds', 'created_at')
+      json = JSON.parse(response.body)
+      expect(json).to include('resource_owner_id', 'expires_in_seconds', 'created_at')
     end
   end
 end

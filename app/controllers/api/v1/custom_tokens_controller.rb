@@ -1,4 +1,4 @@
-class Api::V1::CustomTokensController < Doorkeeper::TokensController
+class API::V1::CustomTokensController < Doorkeeper::TokensController
 
   def create
     response = authorize_response
