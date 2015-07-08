@@ -11,21 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150625180607) do
+ActiveRecord::Schema.define(version: 20150708163507) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "access_tokens", force: :cascade do |t|
-    t.integer  "user_id",      null: false
-    t.string   "access_token", null: false
-    t.datetime "expires_at",   null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "access_tokens", ["access_token"], name: "index_access_tokens_on_access_token", unique: true, using: :btree
-  add_index "access_tokens", ["user_id"], name: "index_access_tokens_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
