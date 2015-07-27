@@ -1,5 +1,6 @@
 class Api::V1::TeamsController < Api::V1::BaseController
 	  skip_before_filter :doorkeeper_authorize!, only: [:create]
+	  # before_filter :is_admin?, only: [:create]
 	  before_filter :find_user, except: [:create, :index]
 
   def index
@@ -14,6 +15,8 @@ class Api::V1::TeamsController < Api::V1::BaseController
 
   def create
     @team = Team.create(create_params)
+    @team_user = TeamUser.create(user: current_user, team: @team)
+    @team_user.save
     if @team.valid?
       render(
         json: @team
@@ -46,34 +49,14 @@ class Api::V1::TeamsController < Api::V1::BaseController
   private
 
   def create_params
-    params.require(:team).permit(:email, :password, :password_confirmation, :admin)
+    params.require(:team).permit(:name)
   end
 
   def find_user
-    @team = User.find(params[:id])
+    @user == current_user
   end
 
   def is_admin?
     return render_unauthorized unless current_user.admin?
-  end
-
-  def create_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :admin)
-  end
-
-  def update_params
-    update_params = create_params
-
-    if update_params[:password].blank? &&
-      update_params[:password_confirmation].blank?
-
-      update_params.delete :password
-      update_params.delete :password_confirmation
-    end
-
-    if !guardian.is_admin?
-      update_params.delete :admin
-    end
-    update_params
   end
 end

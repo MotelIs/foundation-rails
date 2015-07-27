@@ -1,6 +1,6 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-ruby '2.2.2'
+ruby "2.2.2"
 
 #gems that are followed by *U-[context]* require manual changes after cloning.
 gem 'airbrake' # *U-api key*

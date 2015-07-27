@@ -22,32 +22,43 @@ describe Api::V1::TeamsController do
 
     it 'should return a list of teams for an admin' do
       @admin = create(:admin)
+      @user = create(:user)
       authenticate_as @admin
       get :index, format: :json
-      expect(json_response['data'].length).to eq User.count
+      expect(json_response['data'].length).to eq Team.count
     end
   end
+
+  describe '#show' do
+    before do
+      @user = create(:user)
+      @team = create(:team)
+    end
+
+    it 'should allow a user to see a specific team' do
+      authenticate_as @user
+      get :show, id: @team.id, format: :json
+      expect(response.status).to eq 200
+    end
+  end
+
+  describe '#create' do
+    before do
+      @attrs = attributes_for :team
+      @user = create(:user)
+    end
+
+    it 'should allow a user to create a team' do
+      authenticate_as @user
+      post :create, team: @attrs, format: :json
+      expect(response.status).to eq 200
+    end
+
+    # it 'should not render the page for a guest' do
+
+    # end
+  end
 end
-#   describe '#create' do
-#     before do
-#       @attrss = attributes_for(:user)
-#     end
-
-#     it 'should respond with errors for a non admin' do
-#       @attrss.delete(:email)
-#       post :create, user: @attrss, format: :json
-#       expect(response.status).to eq 422
-#     end
-
-#     it 'should not render the page for a guest' do
-
-#     end
-
-#     it 'should allow creation of a valid user' do
-#       post :create, user: @attrss, format: :json
-#       expect(response.status).to eq 200
-#     end
-#   end
 
 #   describe '#update' do
 #     before do
