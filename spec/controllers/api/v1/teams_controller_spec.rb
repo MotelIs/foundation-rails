@@ -45,18 +45,19 @@ describe Api::V1::TeamsController do
   describe '#create' do
     before do
       @attrs = attributes_for :team
-      @user = create(:user)
     end
 
     it 'should allow a user to create a team' do
+      @user = create(:user)
       authenticate_as @user
       post :create, team: @attrs, format: :json
       expect(response.status).to eq 200
     end
 
-    # it 'should not render the page for a guest' do
-
-    # end
+    it 'should not render the page for a guest' do
+      post :create, team: @attrs, format: :json
+      expect(response.status).to eq 401
+    end
   end
 end
 
