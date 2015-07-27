@@ -13,6 +13,7 @@ Rails.application.routes.draw do
         namespace :links do
         end
       end
+      resources :teams, only: [:index, :create, :show, :update, :destroy]
       resources :password_recoveries,   only: [:create]
       resources :password_resets,       only: [:create]
       resources :sessions, only: [:create]
