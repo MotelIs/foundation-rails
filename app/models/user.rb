@@ -8,8 +8,8 @@ class User < ActiveRecord::Base
   VALID_EMAIL_REGEX = /\A([\w+\-.]?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
 
   has_one :role
-  has_many :team_users
-  has_many :teams, through: :team_users
+  has_many :team_memberships
+  has_many :teams, through: :team_memberships
 
   before_create :create_activation_digest
   before_create :generate_authentication_token
