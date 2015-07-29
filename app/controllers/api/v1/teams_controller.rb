@@ -1,17 +1,15 @@
 class Api::V1::TeamsController < Api::V1::BaseController
-	  skip_before_filter :doorkeeper_authorize!, only: [:create]
-	  before_filter :can_see?, only: [:create, :index, :show]
-    before_filter :is_owner?, only: [:destroy]
-    before_filter :is_valid?, only: [:update]
+  before_filter :can_administrate?, only: [:index, :create]
+  before_filter :can_see?, only: [:show]
+  before_filter :can_edit?, only: [:update, :destroy]
 
   def index
-  	teams = Team.all
-  	render json: teams
+  	@teams = Team.all
+  	render json: @teams
   end
 
   def show
-    team = Team.find(params[:id])
-    render json: team
+    render json: @team
   end
 
   def create
@@ -19,9 +17,6 @@ class Api::V1::TeamsController < Api::V1::BaseController
     render(
       json: @team
     )
-    if @team.save
-      TeamMembership.new(user: @user, team: @team, role: "owner")
-    end
   end
 
   def update
@@ -43,10 +38,18 @@ class Api::V1::TeamsController < Api::V1::BaseController
 
   private
 
-  def is_owner?
-    find_user
-    binding.pry
-    return render_unauthorized unless @user.role == "owner"
+  def can_administrate?
+    return render_unauthorized unless guardian.is_admin?
+  end
+
+  def can_edit?
+    @team = Team.find(params[:id])
+    return render_unauthorized unless guardian.can_edit?(@team)
+  end
+
+  def can_see?
+    @team = Team.includes(:team_memberships).find(params[:id])
+    return render_unauthorized unless @user != nil
   end
 
   def is_valid?
@@ -54,20 +57,7 @@ class Api::V1::TeamsController < Api::V1::BaseController
     return render_unauthorized unless @user.role == "owner" || @user.role == "lead"
   end
 
-  def can_see?
-    find_user
-    return render_unauthorized unless @user != nil
-  end
-
   def team_params
     params.require(:team).permit(:name)
-  end
-
-  def find_user
-    @user = current_user
-  end
-
-  def is_admin?
-    return render_unauthorized unless current_user.admin?
   end
 end

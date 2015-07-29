@@ -1,8 +1,8 @@
-class Api::V1::TeamMembershipsController
+class Api::V1::TeamMembershipsController < Api::V1::BaseController
 	before_filter :can_create?, only: :create
 
 	def create
-		@team.save
+		@membership.save
 		render :json, @membership
 	end
 

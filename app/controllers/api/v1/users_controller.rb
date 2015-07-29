@@ -1,5 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
   skip_before_filter :doorkeeper_authorize!, only: [:create]
+
   before_filter :is_admin?, only: [:index]
   before_filter :find_user, except: [:create, :index]
   before_filter :can_see?, only: [:show]
@@ -64,7 +65,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     params.require(:user).permit(:email, :password, :password_confirmation, :admin)
   end
 
-  def find_user
+ def find_user
     @user = User.find(params[:id])
   end
 
@@ -73,7 +74,8 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def update_params
-    update_params = create_params
+    update_params = params.require(:user).permit(:email,
+      :password, :password_confirmation, :admin)
 
     if update_params[:password].blank? &&
       update_params[:password_confirmation].blank?

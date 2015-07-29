@@ -1,6 +1,10 @@
+require_dependency 'guardian/ensure_magic'
 require_dependency 'guardian/user_guardian'
+require_dependency 'guardian/team_guardian'
 
 class Guardian
+  include EnsureMagic
+  include TeamGuardian
   include UserGuardian
 
   class AnonymousUser
@@ -36,6 +40,10 @@ class Guardian
 
   def can_edit?(obj)
     can_do?(:edit, obj)
+  end
+
+  def can_administrate_through_team?(other)
+    TeamMembership.is_employee_of_member?(user, other)
   end
 
   private

@@ -10,7 +10,7 @@ describe Api::V1::TeamsController do
     before do
       @teams = []
       3.times do
-        @pharmacies << create(:team)
+        @teams << create(:team)
       end
     end
 

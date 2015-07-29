@@ -86,6 +86,47 @@ describe Guardian do
       it 'returns true for an admin' do
         expect(Guardian.new(admin).can_edit?(user)).to be true
       end
+
+      it 'returns true for an owner of a team' do
+        @team = create(:team)
+        @team.owners << user
+        @team.members << another_user
+        expect(Guardian.new(user).can_edit?(another_user)).to be true
+      end
+
+      it 'returns true for a lead of a related team' do
+        @team = create(:team)
+        @team.leads << user
+        @team.members << another_user
+        expect(Guardian.new(user).can_edit?(another_user)).to be true
+      end
+    end
+  end
+
+  describe '.can_administrate_through_team?' do
+    before do
+      @team = create(:team)
+      @member= create(:user)
+      @team.members << @member
+    end
+
+    it 'returns true for an owner' do
+      @team.owners << user
+      expect(Guardian.new(user).can_administrate_through_team?(@member)).to be true
+    end
+
+    it 'returns true for a lead' do
+      @team.leads << user
+      expect(Guardian.new(user).can_administrate_through_team?(@member)).to be true
+    end
+
+    it 'returns false for a member' do
+      @team.members << user
+      expect(Guardian.new(user).can_administrate_through_team?(@member)).to be false
+    end
+
+    it 'returns false for an unrelated user' do
+      expect(Guardian.new(user).can_administrate_through_team?(@member)).to be false
     end
   end
 end
