@@ -35,7 +35,7 @@ describe Api::V1::TeamsController do
 
   describe '#show' do
     before do
-      @team = create[:team]
+      @team = create(:team)
     end
 
     it 'should not allow a guest to see a specific team' do
@@ -69,14 +69,14 @@ describe Api::V1::TeamsController do
     end
 
     it 'should respond with a created team' do
-      authenticate_as @user
+      authenticate_as @admin
       expect {
         post :create, team: {
           name: 'purple'
         }, format: :json
       }.to change(Team, :count).by(1)
 
-      exepct(json_response).to include('team')
+      expect(json_response['data']['type']).to include('teams')
     end
 
     it "should give the creator the role of 'owner'" do

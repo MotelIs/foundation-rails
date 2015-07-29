@@ -10,7 +10,7 @@ module TeamGuardian
 
 	def can_create_membership? membership
 		return false if anonymous? || (!membership.present?) || (!membership.team.present?)
-		is admin? ||
+		is_admin? ||
 			is_owner_of_team?(membership) ||
 			is_staff_member_creating_equal_or_lower?(membership)
 	end

@@ -5,11 +5,11 @@ class Team < ActiveRecord::Base
   has_many :users, through: :team_memberships
   has_many :team_memberships
 
-  has_many :leader_memberships, -> { where(role: ‘leader’) },
+  has_many :member_memberships, -> { where(role: 0) },
+    class_name: 'TeamMembership'
+  has_many :lead_memberships, -> { where(role: 1) },
   	class_name: 'TeamMembership'
-  has_many :owner_memberships, -> { where(role: ‘owner’) },
-  	class_name: 'TeamMembership'
-  has_many :member_memberships, -> { where(role: ‘member’) },
+  has_many :owner_memberships, -> { where(role: 2) },
   	class_name: 'TeamMembership'
 
   has_many :members, through: :member_memberships, source: :user
