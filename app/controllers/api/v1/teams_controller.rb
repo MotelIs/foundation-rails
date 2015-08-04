@@ -4,8 +4,8 @@ class Api::V1::TeamsController < Api::V1::BaseController
   before_filter :can_edit?, only: [:update, :destroy]
 
   def index
-  	@teams = Team.all
-  	render json: @teams
+    @teams = Team.all
+    render json: @teams
   end
 
   def show
