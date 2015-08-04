@@ -34,6 +34,11 @@ class Guardian
     @user.admin?
   end
 
+  def is_staff?
+  user_membership = TeamMembership.find_by(user: current_user, role: [1,2])
+  !user_membership.nil?
+  end
+
   def can_see?(obj)
     can_do?(:see, obj)
   end

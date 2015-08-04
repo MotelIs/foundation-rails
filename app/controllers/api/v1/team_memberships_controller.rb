@@ -3,7 +3,9 @@ class Api::V1::TeamMembershipsController < Api::V1::BaseController
 
 	def create
 		@membership.save
-		render :json, @membership
+		render(
+			json: @membership
+		)
 	end
 
 	def show

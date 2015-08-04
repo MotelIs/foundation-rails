@@ -27,7 +27,7 @@ describe Team do
 
     it do
       should have_many(:members).
-        through(:team_memberships).
+        through(:member_memberships).
         source(:user)
     end
 
@@ -81,7 +81,7 @@ describe Team do
     end
 
     it 'returns false for lead' do
-      @team.lead << @user
+      @team.leads << @user
       expect(@team.is_owner?(@user)).to be false
     end
   end

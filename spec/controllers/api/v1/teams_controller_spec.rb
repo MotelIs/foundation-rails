@@ -19,15 +19,14 @@ describe Api::V1::TeamsController do
       expect(response.status).to eq 401
     end
 
-    it 'should allow a normal user to view a list' do
+    it 'should not allow a normal user to view a list' do
       authenticate_as @user
       get :index, format: :json
-      expect(response.status).to eq 200
+      expect(response.status).to eq 401
     end
 
-
-    it 'should return a list of teams' do
-      authenticate_as @user
+    it 'should return a list of teams for an admin' do
+      authenticate_as @admin
       get :index, format: :json
       expect(json_response['data'].length).to eq Team.count
     end
@@ -39,16 +38,19 @@ describe Api::V1::TeamsController do
     end
 
     it 'should not allow a guest to see a specific team' do
+      @nonmember = create(:user)
+      authenticate_as @nonmember
       get :show, id: @team.id, format: :json
       expect(response).to render_unauthorized
     end
 
-    it 'should allow a user to see a specific team' do
+    it 'should allow a member to see their own team' do
+      @team.members << @user
       authenticate_as @user
       get :show, id: @team.id, format: :json
       expect(response.status).to eq 200
-      expect(json_response).to include('team')
-      expect(json_response['team']['id']).to eq @team.id
+      expect(json_response['data']['type']).to include('teams')
+      expect(json_response['data']['id'].to_i).to eq @team.id
     end
   end
 
@@ -57,10 +59,16 @@ describe Api::V1::TeamsController do
       @attrs = attributes_for :team
     end
 
-    it 'should allow a user to create a team' do
-      authenticate_as @user
+    it 'should allow an admin to create a team' do
+      authenticate_as @admin
       post :create, team: @attrs, format: :json
       expect(response.status).to eq 200
+    end
+
+    it 'should not allow a user to create a team' do
+      authenticate_as @user
+      post :create, team: @attrs, format: :json
+      expect(response.status).to eq 401
     end
 
     it 'should not render the page for a guest' do
@@ -80,9 +88,10 @@ describe Api::V1::TeamsController do
     end
 
     it "should give the creator the role of 'owner'" do
-      authenticate_as @user
+      authenticate_as @admin
       post :create, team: @attrs, format: :json
-      expect(@user.role).to eq "owner"
+      @team_membership = TeamMembership.find_by(team: Team.last)
+      expect(@team_membership.role).to eq "owner"
     end
   end
 
@@ -130,11 +139,12 @@ describe Api::V1::TeamsController do
       expect(response).to render_unauthorized
     end
 
-    it 'should allow a user to delete their own record' do
-      authenticate_as @user
+    it 'should allow an owner to delete their own team' do
+      authenticate_as @admin
+      @team.owners << @admin
       expect {
-        delete :destroy, id: @user.id, format: :json
-      }.to change(User, :count).by(-1)
+        delete :destroy, id: @team.id, format: :json
+      }.to change(Team, :count).by(-1)
     end
   end
 end

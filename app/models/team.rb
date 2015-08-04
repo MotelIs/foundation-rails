@@ -11,6 +11,8 @@ class Team < ActiveRecord::Base
   	class_name: 'TeamMembership'
   has_many :owner_memberships, -> { where(role: 2) },
   	class_name: 'TeamMembership'
+  has_many :staff_memberships, -> { where(role: [1, 2] ) },
+    class_name: 'TeamMembership'
 
   has_many :members, through: :member_memberships, source: :user
   has_many :owners, through: :owner_memberships, source: :user
@@ -29,7 +31,6 @@ class Team < ActiveRecord::Base
   end
 
   def is_staff? user
-    owner_memberships.where(user: user).exists? ||
-    lead_memberships.where(user: user).exists?
+    staff_memberships.where(user: user).exists?
   end
 end

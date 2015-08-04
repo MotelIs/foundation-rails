@@ -67,10 +67,32 @@ describe Guardian do
         expect(Guardian.new(user).can_see?(another_user)).to be false
       end
     end
+
+    context 'a Team' do
+      let(:team) { create(:team) }
+
+      it 'returns true for an admin' do
+        expect(Guardian.new(admin).can_see?(team)).to be true
+      end
+
+      it 'returns true for the owner of a team' do
+        team.owners << user
+        expect(Guardian.new(user).can_see?(team)).to be true
+      end
+
+      it 'returns true for a member of a team' do
+        team.members << user
+        expect(Guardian.new(user).can_see?(team)).to eq true
+      end
+
+      it 'returns false for others' do
+        expect(Guardian.new(user).can_see?(team)).to be false
+      end
+    end
   end
 
-  describe '.can_edit?' do
-    context 'a User' do
+    describe '.can_edit?' do
+      context 'a User' do
       it 'returns false for an anonymous user' do
         expect(Guardian.new.can_edit?(user)).to be false
       end
@@ -94,7 +116,7 @@ describe Guardian do
         expect(Guardian.new(user).can_edit?(another_user)).to be true
       end
 
-      it 'returns true for a lead of a related team' do
+      it 'returns true for a lead of a team' do
         @team = create(:team)
         @team.leads << user
         @team.members << another_user

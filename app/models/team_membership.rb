@@ -2,6 +2,8 @@ class TeamMembership < ActiveRecord::Base
   belongs_to :team
   belongs_to :user
 
+  has_many :other_members_of_team
+
   enum role: %w(member lead owner)
 
  	validates_uniqueness_of :user_id, scope: :team_id

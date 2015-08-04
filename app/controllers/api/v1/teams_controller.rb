@@ -1,8 +1,7 @@
 class Api::V1::TeamsController < Api::V1::BaseController
-  before_filter :can_administrate?, only: [:index, :create]
+  before_filter :can_administrate?, only: [:create, :index]
   before_filter :can_see?, only: [:show]
   before_filter :can_edit?, only: [:update, :destroy]
-  before_filter :find_user, only: [:index]
 
   def index
   	@teams = Team.all
@@ -18,6 +17,7 @@ class Api::V1::TeamsController < Api::V1::BaseController
     render(
       json: @team
     )
+    TeamMembership.create(user: current_user, team: @team, role: 2) 
   end
 
   def update
@@ -39,11 +39,6 @@ class Api::V1::TeamsController < Api::V1::BaseController
 
   private
 
-  def find_user
-    @user = User.find(params[:id])
-    return render_unauthorized unless guardian.can_see?(@user)
-  end
-
   def can_administrate?
     return render_unauthorized unless guardian.is_admin?
   end
@@ -55,7 +50,7 @@ class Api::V1::TeamsController < Api::V1::BaseController
 
   def can_see?
     @team = Team.includes(:team_memberships).find(params[:id])
-    return render_unauthorized unless @user != nil
+    return render_unauthorized unless guardian.can_see?(@team)
   end
 
   def team_params
