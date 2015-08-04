@@ -1,6 +1,10 @@
+require_dependency 'guardian/ensure_magic'
 require_dependency 'guardian/user_guardian'
+require_dependency 'guardian/team_guardian'
 
 class Guardian
+  include EnsureMagic
+  include TeamGuardian
   include UserGuardian
 
   class AnonymousUser
@@ -30,12 +34,21 @@ class Guardian
     @user.admin?
   end
 
+  def is_staff?
+  user_membership = TeamMembership.find_by(user: current_user, role: [1,2])
+  !user_membership.nil?
+  end
+
   def can_see?(obj)
     can_do?(:see, obj)
   end
 
   def can_edit?(obj)
     can_do?(:edit, obj)
+  end
+
+  def can_administrate_through_team?(other)
+    TeamMembership.is_employee_of_member?(user, other)
   end
 
   private
